@@ -6,6 +6,7 @@
 import logging
 from datetime import date
 from openerp import _, api, exceptions, fields, models
+import re
 
 _logger = logging.getLogger(__name__)
 
@@ -73,6 +74,8 @@ class WizardRenumber(models.TransientModel):
             raise exceptions.MissingError(
                 _('No records found for your selection!'))
 
+        old_moves = {}
+
         _logger.debug("Renumbering %d account moves.", len(move_ids))
         for move in move_ids:
             sequence = move.journal_id.sequence_id
@@ -90,9 +93,26 @@ class WizardRenumber(models.TransientModel):
                     sequence.number_next = self.number_next
                     reset_sequences |= sequence
 
+            # Save the old name, for updating references.
+            old_name = move.name
+
             # Generate (using our own get_id) and write the new move number
             move.name = (sequence.with_context(ir_sequence_date=move.date)
                          .next_by_id())
+
+            # store the old name in the dictionary
+            old_moves[old_name] = move.name
+            try:
+                for key, value in old_moves.iteritems():
+                    if move.ref:
+                        if key in move.ref:
+                            move.ref = re.sub(key, value, move.ref)
+                    for line in move.line_ids:
+                        if line.ref:
+                            if key in line.ref:
+                                line.ref = re.sub(key, value, line.ref)
+            except Exception, e:
+                raise Exception("Unexpected error:" + e.message)
 
         _logger.debug("%d account moves renumbered.", len(move_ids))
 
@@ -106,3 +126,4 @@ class WizardRenumber(models.TransientModel):
             'context': self.env.context,
             'target': 'current',
         }
+
