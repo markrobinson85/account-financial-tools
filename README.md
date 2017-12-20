@@ -28,7 +28,7 @@ addon | version | summary
 [account_balance_line](account_balance_line/) | 9.0.1.1.0 | Display balance totals in move line view
 [account_chart_update](account_chart_update/) | 9.0.1.0.0 | Wizard to update a company's account chart from a template
 [account_check_deposit](account_check_deposit/) | 9.0.0.1.0 | Manage deposit of checks to the bank
-[account_credit_control](account_credit_control/) | 9.0.1.0.1 | Account Credit Control
+[account_credit_control](account_credit_control/) | 9.0.1.0.2 | Account Credit Control
 [account_fiscal_position_vat_check](account_fiscal_position_vat_check/) | 9.0.1.0.0 | Check VAT on invoice validation
 [account_fiscal_year](account_fiscal_year/) | 9.0.1.0.0 | Account Fiscal Year
 [account_invoice_currency](account_invoice_currency/) | 9.0.1.0.0 | Company currency in invoices
@@ -36,7 +36,7 @@ addon | version | summary
 [account_move_line_purchase_info](account_move_line_purchase_info/) | 9.0.1.0.0 | Introduces the purchase order line to the journal items
 [account_move_locking](account_move_locking/) | 9.0.1.0.0 | Move locked to prevent modification
 [account_permanent_lock_move](account_permanent_lock_move/) | 9.0.1.0.0 | Permanent Lock Move
-[account_renumber](account_renumber/) | 9.0.1.0.0 | Account Renumber Wizard
+[account_renumber](account_renumber/) | 9.0.1.0.1 | Account Renumber Wizard
 [account_reversal](account_reversal/) | 9.0.1.0.0 | Wizard for creating a reversal account move
 [currency_rate_update](currency_rate_update/) | 9.0.1.0.0 | Currency Rate Update
 
