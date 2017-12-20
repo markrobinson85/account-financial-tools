@@ -7,6 +7,7 @@ import logging
 from datetime import date
 from openerp import _, api, exceptions, fields, models
 import re
+import dateutil.parser
 
 _logger = logging.getLogger(__name__)
 
@@ -83,8 +84,8 @@ class WizardRenumber(models.TransientModel):
                 if sequence.use_date_range:
                     date_range = self.env["ir.sequence.date_range"].search(
                         [("sequence_id", "=", sequence.id),
-                         ("date_from", "<=", move.date),
-                         ("date_to", ">=", move.date)]
+                         ("date_from", "<=", move.create_date),
+                         ("date_to", ">=", move.create_date)]
                     )
                     if date_range and date_range not in reset_ranges:
                         date_range.number_next = self.number_next
@@ -96,8 +97,9 @@ class WizardRenumber(models.TransientModel):
             # Save the old name, for updating references.
             old_name = move.name
 
+            created_date = dateutil.parser.parse(move.create_date).date().strftime("%Y-%m-%d")
             # Generate (using our own get_id) and write the new move number
-            move.name = (sequence.with_context(ir_sequence_date=move.date)
+            move.name = (sequence.with_context(ir_sequence_date=created_date)
                          .next_by_id())
 
             # store the old name in the dictionary
