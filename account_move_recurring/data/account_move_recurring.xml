@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+    
+        <record id="seq_account_move_recurring" model="ir.sequence">
+            <field name="name">Recurring Journal Entry</field>
+            <field name="code">account.move.recurring</field>
+            <field name="prefix">RECUR</field>
+            <field name="padding">4</field>
+        </record>
+
+    </data>
+</openerp>

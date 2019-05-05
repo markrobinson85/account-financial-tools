@@ -1,0 +1,141 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record id="view_account_move_recurring_form" model="ir.ui.view">
+            <field name="name">account.move.recurring</field>
+            <field name="model">account.move.recurring</field>
+            <field name="arch" type="xml">
+                <form string="Recurring Accounting Entry">
+                    <header>
+                        <button name="button_schedule" states="draft" string="Schedule" type="object" class="oe_highlight" groups="account.group_account_manager" />
+                        <button name="button_cancel" states="scheduled" string="Disable" type="object" groups="account.group_account_manager" />
+                        <button name="button_test_entry" type="object" states="scheduled" string="Test Entry" context="{'test_recurring': True}" groups="account.group_account_manager" />
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <!--<div class="oe_button_box">-->
+                            <!--<button name="open_reconcile_view"-->
+                                <!--class="oe_stat_button"-->
+                                <!--icon="fa-bars"-->
+                                <!--type="object"-->
+                                <!--string="View reconciled entries">-->
+                            <!--</button>-->
+                        <!--</div>-->
+                    <label for="name" class="oe_edit_only" attrs="{'invisible':[('name','=','/')]}"/>
+                    <h1>
+                        <field name="name" readonly="True" attrs="{'invisible':[('name','=','/')]}"/>
+                    </h1>
+                    <group>
+                        <group string="Accounting">
+                            <field name="journal_id" options="{'no_open': True, 'no_create': True}"/>
+                            <field name="company_id" required="1" groups="base.group_multi_company"/>
+                            <field name="partner_id"
+                                domain="['|', ('parent_id', '=', False), ('is_company', '=', True)]"/>
+                            <field name="ref"/>
+                        </group>
+                        <group string="Scheduling">
+                            <field name="frequency" />
+                            <field name="date_last" />
+                            <field name="date_next" />
+                            <field name="post_first_of_month" attrs="{'invisible':[('frequency','not in',['monthly', 'yearly'])]}" />
+                            <field name="create_drafts" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Journal Items">
+                            <field name="line_ids" widget="one2many_list"
+                              context="{'line_ids': line_ids, 'journal_id': journal_id }">
+                                <tree editable="bottom" string="Journal Items">
+                                    <field name="partner_id" domain="['|', ('parent_id', '=', False), ('is_company', '=', True)]"/>
+                                    <field name="account_id" domain="[('company_id', '=', parent.company_id), ('deprecated', '=', False)]"/>
+                                    <field name="name"/>
+                                    <field name="analytic_account_id" groups="analytic.group_analytic_accounting" domain="[('account_type', '=', 'normal')]"/>
+                                    <field name="amount_currency" groups="base.group_multi_currency"/>
+                                    <field name="company_currency_id" invisible="1"/>
+                                    <field name="currency_id" options="{'no_create': True}" groups="base.group_multi_currency"/>
+                                    <field name="debit" sum="Total Debit"/>
+                                    <field name="credit" sum="Total Credit"/>
+                                    <!--<field name="date_maturity" required="0"/>-->
+                                </tree>
+                            </field>
+                            <field name="narration" colspan="4" placeholder="Add an internal note..." nolabel="1" height="50"/>
+                        </page>
+                        <page string="Journal Entries">
+                            <field name="move_ids" widget="one2many_list">
+                                <tree editable="bottom" string="Journal Entries">
+                                    <field name="name"/>
+                                    <field name="partner_id" />
+                                    <field name="journal_id" />
+                                    <field name="date"/>
+                                    <field name="state" />
+                                    <field name="amount"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- tree (list) view-->
+        <record id="view_account_move_recurring_tree" model="ir.ui.view">
+            <field name="name">account.move.recurring.tree</field>
+            <field name="model">account.move.recurring</field>
+            <field name="arch" type="xml">
+                <tree string="Recurring Journal Entries">
+                    <field name="name" />
+                    <field name="partner_id" />
+                    <field name="date_last" />
+                    <field name="date_next" />
+                    <field name="state" />
+                </tree>
+            </field>
+        </record>
+
+        <!-- search -->
+        <record id="view_account_move_recurring_filter" model="ir.ui.view">
+            <field name="name">account.move.recurring.search</field>
+            <field name="model">account.move.recurring</field>
+            <field name="arch" type="xml">
+                <search string="Search Invoice">
+                    <field name="name" string="Recurring Entry" filter_domain="['|','|', ('name','ilike',self), ('reference', 'ilike', self), ('partner_id', 'child_of', self)]"/>
+                    <field name="journal_id" />
+                    <filter name="draft" string="Draft" domain="[('state','in',('draft'))]"/>
+                    <filter name="scheduled" string="Scheduled" domain="[('state','=','scheduled')]" />
+                    <separator/>
+                    <field name="partner_id" operator="child_of"/>
+                    <field name="user_id" string="User"/>
+                    <field name="date_next" string="Date Next"/>
+                    <field name="date_last" string="Date Last"/>
+                    <separator/>
+                    <filter domain="[('user_id','=',uid)]" help="My Recurring Entries"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_partner_id" string="Partner" context="{'group_by':'partner_id'}"/>
+                        <filter string="User" context="{'group_by':'user_id'}"/>
+                        <filter name="status" string="Status" context="{'group_by':'state'}"/>
+                        <separator/>
+                        <filter string="Date Next" context="{'group_by':'date_next'}"/>
+                        <filter string="Date Last" context="{'group_by':'date_last'}"/>
+                    </group>
+               </search>
+            </field>
+        </record>
+
+        <record id="action_account_move_recurring_form" model="ir.actions.act_window">
+            <field name="name">Recurring Journal Entries</field>
+            <field name="res_model">account.move.recurring</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_account_move_recurring_tree"/>
+            <field name="search_view_id" ref="view_account_move_recurring_filter"/>
+        </record>
+
+        <menuitem name="Recurring Journal Entries" action="action_account_move_recurring_form" id="recurring_journal_entries" parent="account.menu_finance_entries" groups="account.group_account_manager"/>
+
+    </data>
+</openerp>
